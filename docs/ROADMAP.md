@@ -74,13 +74,13 @@
 
 ### Phase 2: UI/UX 완성 (더미 데이터 활용)
 
-- [ ] **Task 003: 공통 컴포넌트 및 디자인 시스템 구축**
+- [x] **Task 003: 공통 컴포넌트 및 디자인 시스템 구축**
   - See: `/tasks/003-component-library.md`
-  - [ ] shadcn/ui v4 기반 공통 컴포넌트 설치/구성 (Button, Input, Card, Dialog, Toast/Sonner, Form 등)
-  - [ ] `app/globals.css` 디자인 토큰 정의 (식물 테마 컬러 팔레트, 타이포그래피)
-  - [ ] 헤더 내비게이션 컴포넌트 구현 (로그인/비로그인 상태 분기, lucide-react 아이콘)
-  - [ ] 더미 데이터 생성 유틸리티 작성 (`lib/mock-data.ts` — 더미 세션/정원 식물)
-  - [ ] 반응형 레이아웃 컨테이너 및 공통 스타일 가이드 확립
+  - [x] shadcn/ui v4 기반 공통 컴포넌트 설치/구성 (Button, Input, Card, Dialog, Sonner, Field 등 — 구 Form은 radix-nova에서 Field로 대체)
+  - [x] `app/globals.css` 디자인 토큰 정의 (식물 테마 컬러 팔레트, 타이포그래피)
+  - [x] 헤더 내비게이션 컴포넌트 구현 (로그인/비로그인 상태 분기, lucide-react 아이콘)
+  - [x] 더미 데이터 생성 유틸리티 작성 (`lib/mock-data.ts` — 더미 세션/정원 식물)
+  - [x] 반응형 레이아웃 컨테이너 및 공통 스타일 가이드 확립
 
 - [ ] **Task 004: 인증 관련 페이지 UI 완성**
   - See: `/tasks/004-auth-pages-ui.md`
