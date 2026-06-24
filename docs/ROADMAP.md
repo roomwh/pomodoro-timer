@@ -56,21 +56,21 @@
 
 ### Phase 1: 애플리케이션 골격 구축
 
-- [ ] **Task 001: 프로젝트 구조 및 라우팅 설정** - 우선순위
+- [x] **Task 001: 프로젝트 구조 및 라우팅 설정** - 우선순위
   - See: `/tasks/001-routing-skeleton.md`
-  - [ ] Route Groups로 인증 보호/비보호 영역 분리 (`(auth)` 비로그인 전용, `(app)` 로그인 필수)
-  - [ ] 5개 주요 페이지 빈 껍데기 생성: 랜딩(`/`), 회원가입(`/signup`), 로그인(`/login`), 타이머(`/timer`), 정원(`/garden`)
-  - [ ] 루트 레이아웃 및 그룹별 레이아웃 골격 구현 (헤더 내비게이션 placeholder 포함)
-  - [ ] `proxy.ts` 빈 골격 생성 (세션 갱신/리디렉션 로직은 Phase 3에서 구현)
-  - [ ] `not-found.tsx`, `loading.tsx`, `error.tsx` 기본 파일 배치
+  - [x] Route Groups로 인증 보호/비보호 영역 분리 (`(auth)` 비로그인 전용, `(app)` 로그인 필수)
+  - [x] 5개 주요 페이지 빈 껍데기 생성: 랜딩(`/`), 회원가입(`/signup`), 로그인(`/login`), 타이머(`/timer`), 정원(`/garden`)
+  - [x] 루트 레이아웃 및 그룹별 레이아웃 골격 구현 (헤더 내비게이션 placeholder 포함)
+  - [x] `proxy.ts` 빈 골격 생성 (세션 갱신/리디렉션 로직은 Phase 3에서 구현)
+  - [x] `not-found.tsx`, `loading.tsx`, `error.tsx` 기본 파일 배치
 
-- [ ] **Task 002: 타입 정의 및 데이터 모델 설계**
+- [x] **Task 002: 타입 정의 및 데이터 모델 설계**
   - See: `/tasks/002-types-and-schema.md`
-  - [ ] 도메인 TypeScript 인터페이스 정의 (`FocusSession`, `GardenPlant`, `SessionStatus`, `PlantType`, `GrowthStage`)
-  - [ ] Supabase 데이터베이스 스키마 설계 문서화 (`focus_sessions` / 선택적 `garden_plants`, 구현은 제외)
-  - [ ] RLS 정책 설계 명세 (operation별 USING / WITH CHECK 정의)
-  - [ ] Zod 스키마 정의 (회원가입/로그인 폼, 집중 시간 입력 1~180 범위)
-  - [ ] 식물 종류(튤립/해바라기/선인장) 및 성장 단계(씨앗/새싹/꽃봉오리/만개/시들기) 상수/타입 정의
+  - [x] 도메인 TypeScript 인터페이스 정의 (`FocusSession`, `GardenPlant`, `SessionStatus`, `PlantType`, `GrowthStage`)
+  - [x] Supabase 데이터베이스 스키마 설계 문서화 (`focus_sessions` / 선택적 `garden_plants`, 구현은 제외)
+  - [x] RLS 정책 설계 명세 (operation별 USING / WITH CHECK 정의)
+  - [x] Zod 스키마 정의 (회원가입/로그인 폼, 집중 시간 입력 1~180 범위)
+  - [x] 식물 종류(튤립/해바라기/선인장) 및 성장 단계(씨앗/새싹/꽃봉오리/만개/시들기) 상수/타입 정의
 
 ### Phase 2: UI/UX 완성 (더미 데이터 활용)
 
