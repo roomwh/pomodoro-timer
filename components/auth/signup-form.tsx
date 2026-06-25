@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner";
 
+import { createClient } from "@/lib/supabase/client";
 import { signupSchema, type SignupInput } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,8 +19,13 @@ import {
 import { AuthCard } from "@/components/auth/auth-card";
 
 // 회원가입 폼 — signupSchema 기반 React Hook Form + Zod 클라이언트 검증.
-// 실제 Supabase Auth 연동은 Task 008에서 onSubmit을 교체한다(현재는 더미 비동기).
+// onSubmit에서 Supabase signUp을 호출한다. 이메일 확인 비활성화(대시보드 설정)이므로
+// 가입 즉시 자동 로그인되어 /timer로 이동한다.
 export function SignupForm() {
+  const router = useRouter();
+  // 가입 실패(이미 가입된 이메일 등) 시 폼 상단에 표시할 전역 에러 메시지.
+  const [formError, setFormError] = useState<string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -29,13 +36,25 @@ export function SignupForm() {
     defaultValues: { email: "", password: "", confirmPassword: "" },
   });
 
-  // 더미 제출: 실제 인증 호출 없이 지연 후 안내 토스트만 노출(Task 008에서 교체).
-  // 입력값은 Task 008에서 Supabase signUp 인자로 사용 예정(현재는 미사용).
-  async function onSubmit() {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    toast.success("입력이 확인되었습니다.", {
-      description: "데모 모드입니다 — 실제 가입 처리는 추후 연결됩니다.",
+  // Supabase 브라우저 클라이언트로 회원가입. 이메일 확인 비활성화 가정으로 즉시 세션 생성.
+  // 실패 시 인라인 에러, 성공 시 /timer로 이동한다.
+  async function onSubmit(values: SignupInput) {
+    setFormError(null);
+
+    const supabase = createClient();
+    const { error } = await supabase.auth.signUp({
+      email: values.email,
+      password: values.password,
     });
+
+    if (error) {
+      setFormError("회원가입에 실패했습니다. 이미 사용 중인 이메일일 수 있습니다.");
+      return;
+    }
+
+    // 서버 컴포넌트(레이아웃)가 새 세션을 반영하도록 갱신 후 이동.
+    router.push("/timer");
+    router.refresh();
   }
 
   return (
@@ -53,6 +72,15 @@ export function SignupForm() {
     >
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <FieldGroup>
+          {formError ? (
+            <div
+              role="alert"
+              className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            >
+              {formError}
+            </div>
+          ) : null}
+
           <Field data-invalid={!!errors.email}>
             <FieldLabel htmlFor="signup-email">이메일</FieldLabel>
             <Input

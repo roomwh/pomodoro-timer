@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LogOut, Menu, Sprout, User } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { signOutAction } from "@/app/actions/auth";
 import { Container } from "@/components/container";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +19,7 @@ import {
 
 // 헤더 내비게이션 컴포넌트.
 // variant로 비로그인(public)/로그인(private) 영역의 내비를 분기한다.
-// 실제 세션 기반 분기·이메일 표시·로그아웃 동작은 Task 008에서 연결한다(현재는 placeholder).
+// private variant에서는 세션 이메일 표시 + 로그아웃 Server Action을 연동한다.
 type SiteHeaderVariant = "public" | "private";
 
 type NavItem = { href: string; label: string };
@@ -51,9 +52,32 @@ function NavLink({ href, label }: NavItem) {
   );
 }
 
-export function SiteHeader({ variant }: { variant: SiteHeaderVariant }) {
+// 로그아웃 메뉴 항목 — Server Action을 form action으로 연동한다.
+// DropdownMenuItem을 form 안의 submit 버튼으로 렌더해 클릭 시 signOutAction을 호출한다.
+function LogoutMenuItem() {
+  return (
+    <form action={signOutAction} className="w-full">
+      <DropdownMenuItem asChild>
+        <button type="submit" className="w-full">
+          <LogOut />
+          로그아웃
+        </button>
+      </DropdownMenuItem>
+    </form>
+  );
+}
+
+export function SiteHeader({
+  variant,
+  email,
+}: {
+  variant: SiteHeaderVariant;
+  email?: string;
+}) {
   const items = NAV_ITEMS[variant];
   const homeHref = variant === "private" ? "/timer" : "/";
+  // 이메일이 없는 edge case 방어 — 정상 흐름에서는 layout이 항상 세션 이메일을 전달한다.
+  const displayEmail = email ?? "user@example.com";
 
   return (
     <header className="border-b">
@@ -72,7 +96,6 @@ export function SiteHeader({ variant }: { variant: SiteHeaderVariant }) {
             <NavLink key={item.href} {...item} />
           ))}
           {variant === "private" && (
-            // 사용자 이메일/로그아웃 placeholder — Task 008에서 실제 세션 연결
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon-sm" aria-label="사용자 메뉴">
@@ -81,13 +104,10 @@ export function SiteHeader({ variant }: { variant: SiteHeaderVariant }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel className="text-muted-foreground">
-                  user@example.com
+                  {displayEmail}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem disabled>
-                  <LogOut />
-                  로그아웃
-                </DropdownMenuItem>
+                <LogoutMenuItem />
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -111,12 +131,9 @@ export function SiteHeader({ variant }: { variant: SiteHeaderVariant }) {
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel className="text-muted-foreground">
-                    user@example.com
+                    {displayEmail}
                   </DropdownMenuLabel>
-                  <DropdownMenuItem disabled>
-                    <LogOut />
-                    로그아웃
-                  </DropdownMenuItem>
+                  <LogoutMenuItem />
                 </>
               )}
             </DropdownMenuContent>
