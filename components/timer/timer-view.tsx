@@ -18,22 +18,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Plant } from "@/components/plant/plant";
 import { DurationInput } from "@/components/timer/duration-input";
 import { AbandonDialog } from "@/components/timer/abandon-dialog";
+import { useTimer } from "@/components/timer/use-timer";
 
-type TimerStatus = "idle" | "running" | "completed" | "abandoned";
-
-// 타이머 화면 상태 머신 (UI 더미).
-// 실제 카운트다운/절대 시각 로직은 Task 009, progress→CSS 변수 애니메이션은 Task 010,
-// 세션 저장·식물 랜덤 배정은 Task 011에서 연결한다.
-// 여기서는 수동 progress 슬라이더로 단계 전환을 시연한다(자동 타이밍 없음).
+// 타이머 화면.
+// 카운트다운/절대 시각 로직은 useTimer 훅(Task 009)이 담당한다.
+// progress→CSS 변수 애니메이션은 Task 010, 세션 저장·식물 랜덤 배정은 Task 011.
 export function TimerView() {
-  const [status, setStatus] = useState<TimerStatus>("idle");
   const [durationMinutes, setDurationMinutes] = useState(DEFAULT_DURATION_MINUTES);
-  const [progress, setProgress] = useState(0);
   const [plantType, setPlantType] = useState<PlantType>("tulip");
   const [abandonOpen, setAbandonOpen] = useState(false);
 
+  const { status, progress, remainingSeconds, start, abandon, reset } =
+    useTimer(durationMinutes);
+
   const stage = getGrowthStage(progress);
-  const remainingSeconds = Math.round((1 - progress) * durationMinutes * 60);
 
   // 완료 진입 시 토스트 (실제 "정원에 심기" 저장은 Task 011).
   useEffect(() => {
@@ -44,26 +42,9 @@ export function TimerView() {
     }
   }, [status]);
 
-  function handleStart() {
-    setProgress(0);
-    setStatus("running");
-  }
-
-  function handleProgressChange(next: number) {
-    setProgress(next);
-    if (next >= 1) {
-      setStatus("completed");
-    }
-  }
-
   function handleConfirmAbandon() {
     setAbandonOpen(false);
-    setStatus("abandoned");
-  }
-
-  function handleReset() {
-    setProgress(0);
-    setStatus("idle");
+    abandon();
   }
 
   const isRunning = status === "running";
@@ -132,7 +113,7 @@ export function TimerView() {
                     onChange={setDurationMinutes}
                   />
                 </div>
-                <Button size="lg" className="w-full" onClick={handleStart}>
+                <Button size="lg" className="w-full" onClick={start}>
                   <Play /> 집중 시작
                 </Button>
               </div>
@@ -140,24 +121,12 @@ export function TimerView() {
 
             {isRunning && (
               <div className="flex flex-col gap-5">
-                {/* 더미 진행도 슬라이더 — 실제 카운트다운은 Task 009 */}
-                <div className="flex flex-col gap-2">
-                  <label
-                    htmlFor="demo-progress"
-                    className="text-sm font-medium text-muted-foreground"
-                  >
-                    데모 진행도 (실제 타이머는 추후 연결) ·{" "}
+                {/* 진행도 표시 — 식물 시각 영역의 카운트다운과 동기화 */}
+                <div className="flex flex-col gap-2 text-center">
+                  <span className="text-sm font-medium text-muted-foreground">
+                    집중하는 중 ·{" "}
                     <span className="tabular-nums">{Math.round(progress * 100)}%</span>
-                  </label>
-                  <input
-                    id="demo-progress"
-                    type="range"
-                    min={0}
-                    max={100}
-                    value={Math.round(progress * 100)}
-                    onChange={(e) => handleProgressChange(Number(e.target.value) / 100)}
-                    className="accent-primary"
-                  />
+                  </span>
                 </div>
                 <Button
                   variant="destructive"
@@ -184,7 +153,7 @@ export function TimerView() {
                   <Button
                     variant="outline"
                     className="flex-1"
-                    onClick={handleReset}
+                    onClick={reset}
                   >
                     <RotateCcw /> 다시 집중
                   </Button>
@@ -198,7 +167,7 @@ export function TimerView() {
                 <p className="text-sm text-muted-foreground">
                   괜찮아요. 다음 집중에서 다시 멋진 식물을 키워봐요.
                 </p>
-                <Button className="w-full" onClick={handleReset}>
+                <Button className="w-full" onClick={reset}>
                   <RotateCcw /> 새로 시작
                 </Button>
               </div>

@@ -55,3 +55,10 @@ export const MIN_DURATION_MINUTES = 1;
 export const MAX_DURATION_MINUTES = 180;
 /** 타이머 설정 기본값(분) — 전통적 포모도로 1세트 */
 export const DEFAULT_DURATION_MINUTES = 25;
+
+/**
+ * 타이머 표시 갱신 주기(ms).
+ * 카운트다운(MM:SS)을 1초 간격으로 갱신한다. 정밀도는 인터벌 빈도가 아니라
+ * `Date.now()` 차분에서 나오므로(틱 누적 금지), throttle 보정은 visibilitychange/focus가 담당한다.
+ */
+export const TIMER_TICK_INTERVAL_MS = 1000;
