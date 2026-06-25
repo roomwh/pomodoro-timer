@@ -2,8 +2,8 @@
 // 경계값은 `GROWTH_STAGE_RANGES`(lib/constants)와 동일하며, Task 010(성장 애니메이션)도
 // 이 함수를 재사용한다. `withered`(시들기)는 progress 기반이 아니므로 여기서 다루지 않는다.
 
-import { GROWTH_STAGE_RANGES } from "@/lib/constants";
-import type { GrowthStage } from "@/lib/types";
+import { GROWTH_STAGE_RANGES, PLANT_TYPES } from "@/lib/constants";
+import type { GrowthStage, PlantType } from "@/lib/types";
 
 /**
  * progress(0.0~1.0)에 해당하는 성장 단계를 반환한다.
@@ -26,4 +26,14 @@ export function getGrowthStage(progress: number): GrowthStage {
 
   // 이론상 도달하지 않음(클램프된 값은 항상 한 구간에 속함).
   return "bloom";
+}
+
+/**
+ * 지원 식물 종류 중 하나를 균등 랜덤으로 배정한다.
+ * 타이머 시작(start) 시점에 한 번 뽑아 진행 중 자라는 식물과 저장되는 식물을 일치시킨다.
+ * 식물 종류는 게임성 리워드일 뿐 보안 자원이 아니므로 클라이언트 랜덤으로 충분하다.
+ */
+export function pickRandomPlantType(): PlantType {
+  const index = Math.floor(Math.random() * PLANT_TYPES.length);
+  return PLANT_TYPES[index];
 }

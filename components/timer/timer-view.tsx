@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Play, Flag, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  DEFAULT_DURATION_MINUTES,
-  PLANT_META,
-  PLANT_TYPES,
-} from "@/lib/constants";
+import { DEFAULT_DURATION_MINUTES, PLANT_META } from "@/lib/constants";
 import { formatMMSS } from "@/lib/time";
+import { pickRandomPlantType } from "@/lib/plant";
 import type { PlantType } from "@/lib/types";
+import { saveSession } from "@/app/actions/session";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { GrowingPlant } from "@/components/plant/growing-plant";
@@ -20,24 +18,59 @@ import { AbandonDialog } from "@/components/timer/abandon-dialog";
 import { useTimer } from "@/components/timer/use-timer";
 
 // 타이머 화면.
-// 카운트다운/절대 시각 로직은 useTimer 훅(Task 009)이 담당한다.
-// progress→CSS 변수 애니메이션은 Task 010, 세션 저장·식물 랜덤 배정은 Task 011.
+// 카운트다운/절대 시각 로직은 useTimer 훅(Task 009)이, progress→CSS 변수 애니메이션은
+// GrowingPlant(Task 010)이 담당한다. 세션 저장·식물 랜덤 배정은 Task 011에서 연결한다.
 export function TimerView() {
   const [durationMinutes, setDurationMinutes] = useState(DEFAULT_DURATION_MINUTES);
+  // 식물 종류는 start 시점에 랜덤 배정한다. idle 미리보기는 기본값(progress 0 = 씨앗이라 종류 무관).
   const [plantType, setPlantType] = useState<PlantType>("tulip");
   const [abandonOpen, setAbandonOpen] = useState(false);
 
-  const { status, progress, remainingSeconds, start, abandon, reset } =
+  const { status, progress, remainingSeconds, startedAt, start, abandon, reset } =
     useTimer(durationMinutes);
 
-  // 완료 진입 시 토스트 (실제 "정원에 심기" 저장은 Task 011).
+  // 한 세션당 정확히 1회만 저장하기 위한 가드(완료/포기 콜백·리렌더·Strict Mode 이중 호출 대비).
+  const savedRef = useRef(false);
+
+  // 완료/포기 종결 시 focus_sessions에 1회 저장한다.
   useEffect(() => {
-    if (status === "completed") {
-      toast.success("집중 완료! 🌷", {
-        description: "데모 모드입니다 — 정원 저장은 추후 연결됩니다.",
-      });
-    }
-  }, [status]);
+    if (status !== "completed" && status !== "abandoned") return;
+    if (savedRef.current) return;
+    if (startedAt === null) return; // 시작 시각 없으면 저장 불가(방어)
+    savedRef.current = true;
+
+    const sessionStatus = status === "completed" ? "completed" : "abandoned";
+    void saveSession({
+      durationMinutes,
+      plantType,
+      status: sessionStatus,
+      startedAt: new Date(startedAt).toISOString(),
+      completedAt: new Date().toISOString(),
+    }).then((result) => {
+      if (!result.ok) {
+        toast.error("세션 저장에 실패했어요", { description: result.error });
+        return;
+      }
+      if (sessionStatus === "completed") {
+        toast.success("정원에 심기 완료! 🌷", {
+          description: "방금 키운 식물이 정원에 추가됐어요.",
+        });
+      }
+    });
+  }, [status, startedAt, durationMinutes, plantType]);
+
+  // 시작 — 식물을 랜덤 배정하고 저장 가드를 초기화한다.
+  function handleStart() {
+    savedRef.current = false;
+    setPlantType(pickRandomPlantType());
+    start();
+  }
+
+  // 초기화 — 저장 가드를 풀고 idle로 복귀한다("다시 집중"/"새로 시작" 공통).
+  function handleReset() {
+    savedRef.current = false;
+    reset();
+  }
 
   function handleConfirmAbandon() {
     setAbandonOpen(false);
@@ -73,29 +106,6 @@ export function TimerView() {
         {/* ── 컨트롤 영역 ───────────────────────────── */}
         <Card className="mx-auto w-full max-w-md">
           <CardContent className="flex flex-col gap-6">
-            {/* 식물 종류 선택 (데모용 — 실제 랜덤 배정은 Task 011) */}
-            {(status === "idle" || isRunning) && (
-              <div className="flex flex-col gap-2">
-                <span className="text-sm font-medium text-muted-foreground">
-                  식물 종류 (미리보기)
-                </span>
-                <div className="flex gap-2">
-                  {PLANT_TYPES.map((type) => (
-                    <Button
-                      key={type}
-                      type="button"
-                      variant={plantType === type ? "default" : "outline"}
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => setPlantType(type)}
-                    >
-                      {PLANT_META[type].emoji} {PLANT_META[type].label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {status === "idle" && (
               <div className="flex flex-col items-center gap-5">
                 <div className="flex flex-col items-center gap-2">
@@ -107,7 +117,7 @@ export function TimerView() {
                     onChange={setDurationMinutes}
                   />
                 </div>
-                <Button size="lg" className="w-full" onClick={start}>
+                <Button size="lg" className="w-full" onClick={handleStart}>
                   <Play /> 집중 시작
                 </Button>
               </div>
@@ -147,7 +157,7 @@ export function TimerView() {
                   <Button
                     variant="outline"
                     className="flex-1"
-                    onClick={reset}
+                    onClick={handleReset}
                   >
                     <RotateCcw /> 다시 집중
                   </Button>
@@ -161,7 +171,7 @@ export function TimerView() {
                 <p className="text-sm text-muted-foreground">
                   괜찮아요. 다음 집중에서 다시 멋진 식물을 키워봐요.
                 </p>
-                <Button className="w-full" onClick={reset}>
+                <Button className="w-full" onClick={handleReset}>
                   <RotateCcw /> 새로 시작
                 </Button>
               </div>

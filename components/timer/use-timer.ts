@@ -18,6 +18,8 @@ export interface UseTimerResult {
   progress: number;
   /** 남은 시간(초, 올림) — 카운트다운 표시용 */
   remainingSeconds: number;
+  /** 시작 절대 시각(epoch ms) — 세션 저장(started_at)용. idle/초기화 시 null */
+  startedAt: number | null;
   /** idle/완료/포기 상태에서 호출 — 카운트다운 시작 */
   start: () => void;
   /** running 상태에서 호출 — 진행 중단 후 abandoned로 전환 */
@@ -34,6 +36,10 @@ export function useTimer(durationMinutes: number): UseTimerResult {
   const [status, setStatus] = useState<TimerStatus>("idle");
   const [progress, setProgress] = useState(0);
   const [remainingSeconds, setRemainingSeconds] = useState(0);
+  // 시작 절대 시각(epoch ms) — 세션 저장용 노출 값.
+  // startTimeRef는 abandon 시 null로 비워지므로(sync 중단), 저장에 필요한 시작 시각은
+  // 별도 state로 보존한다(완료/포기 상태에서 읽을 수 있게). reset에서만 초기화한다.
+  const [startedAt, setStartedAt] = useState<number | null>(null);
 
   // 시작 절대 시각(ms)과 총 시간(ms). 인터벌/리스너 콜백이 참조하므로 ref로 보관한다.
   const startTimeRef = useRef<number | null>(null);
@@ -100,8 +106,10 @@ export function useTimer(durationMinutes: number): UseTimerResult {
   }, [status, sync, clearTick]);
 
   const start = useCallback(() => {
+    const now = Date.now();
     totalMsRef.current = durationMinutes * 60 * 1000;
-    startTimeRef.current = Date.now();
+    startTimeRef.current = now;
+    setStartedAt(now);
     setProgress(0);
     setRemainingSeconds(durationMinutes * 60);
     setStatus("running");
@@ -109,6 +117,7 @@ export function useTimer(durationMinutes: number): UseTimerResult {
 
   const abandon = useCallback(() => {
     clearTick();
+    // sync 중단을 위해 ref는 비우되, 저장용 startedAt state는 유지한다.
     startTimeRef.current = null;
     setStatus("abandoned");
   }, [clearTick]);
@@ -116,10 +125,11 @@ export function useTimer(durationMinutes: number): UseTimerResult {
   const reset = useCallback(() => {
     clearTick();
     startTimeRef.current = null;
+    setStartedAt(null);
     setProgress(0);
     setRemainingSeconds(0);
     setStatus("idle");
   }, [clearTick]);
 
-  return { status, progress, remainingSeconds, start, abandon, reset };
+  return { status, progress, remainingSeconds, startedAt, start, abandon, reset };
 }
