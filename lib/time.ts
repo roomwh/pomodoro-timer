@@ -12,3 +12,18 @@ export function formatMMSS(totalSeconds: number): string {
   const seconds = safe % 60;
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
+
+/**
+ * 총 분(minutes)을 "N시간 M분" 또는 "M분"으로 포맷한다.
+ * 집계 타일과 식물 카드의 집중 시간 표시에 사용한다.
+ * 예) 0 → "0분", 25 → "25분", 90 → "1시간 30분", 60 → "1시간"
+ */
+export function formatMinutes(totalMinutes: number): string {
+  const safe = Math.max(0, Math.floor(totalMinutes));
+  if (safe === 0) return "0분";
+  const hours = Math.floor(safe / 60);
+  const minutes = safe % 60;
+  if (hours === 0) return `${minutes}분`;
+  if (minutes === 0) return `${hours}시간`;
+  return `${hours}시간 ${minutes}분`;
+}

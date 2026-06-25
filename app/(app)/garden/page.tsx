@@ -1,11 +1,25 @@
-// 정원 페이지 골격 (/garden) — 실제 UI는 Task 006, 데이터 연동은 Task 011에서 구현
+// 정원 페이지 — 서버 컴포넌트.
+// Task 011에서 아래 import를 실제 Supabase 쿼리 함수로 교체하면 된다.
+import {
+  MOCK_GARDEN_PLANTS,
+  MOCK_FOCUS_SESSIONS,
+  getCompletedSessionCount,
+  getTotalFocusMinutes,
+} from "@/lib/mock-data";
+import { GardenView } from "@/components/garden/garden-view";
+
 export default function GardenPage() {
+  const plants = MOCK_GARDEN_PLANTS;
+  const sessions = MOCK_FOCUS_SESSIONS;
+  const completedCount = getCompletedSessionCount(sessions);
+  const totalMinutes = getTotalFocusMinutes(sessions);
+
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-      <h1 className="text-2xl font-semibold tracking-tight">정원</h1>
-      <p className="text-muted-foreground">
-        완성한 식물과 집중 기록은 추후 구현됩니다.
-      </p>
-    </div>
+    <GardenView
+      plants={plants}
+      sessions={sessions}
+      completedCount={completedCount}
+      totalMinutes={totalMinutes}
+    />
   );
 }
