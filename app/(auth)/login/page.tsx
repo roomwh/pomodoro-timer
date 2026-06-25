@@ -1,9 +1,7 @@
-// 로그인 페이지 골격 (/login) — 실제 폼/인증은 Task 004 · Task 008에서 구현
+import { LoginForm } from "@/components/auth/login-form";
+
+// 로그인 페이지 (/login) — 서버 컴포넌트로 유지하고 클라이언트 폼을 마운트.
+// 실제 인증 연동은 Task 008.
 export default function LoginPage() {
-  return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
-      <h1 className="text-2xl font-semibold tracking-tight">로그인</h1>
-      <p className="text-muted-foreground">로그인 폼은 추후 구현됩니다.</p>
-    </div>
-  );
+  return <LoginForm />;
 }
