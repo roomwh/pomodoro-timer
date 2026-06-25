@@ -10,12 +10,11 @@ import {
   PLANT_META,
   PLANT_TYPES,
 } from "@/lib/constants";
-import { getGrowthStage } from "@/lib/plant";
 import { formatMMSS } from "@/lib/time";
 import type { PlantType } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plant } from "@/components/plant/plant";
+import { GrowingPlant } from "@/components/plant/growing-plant";
 import { DurationInput } from "@/components/timer/duration-input";
 import { AbandonDialog } from "@/components/timer/abandon-dialog";
 import { useTimer } from "@/components/timer/use-timer";
@@ -30,8 +29,6 @@ export function TimerView() {
 
   const { status, progress, remainingSeconds, start, abandon, reset } =
     useTimer(durationMinutes);
-
-  const stage = getGrowthStage(progress);
 
   // 완료 진입 시 토스트 (실제 "정원에 심기" 저장은 Task 011).
   useEffect(() => {
@@ -51,17 +48,14 @@ export function TimerView() {
   const isCompleted = status === "completed";
   const isAbandoned = status === "abandoned";
 
-  // 화면에 표시할 식물 상태 결정.
-  const plantStage = isAbandoned ? "withered" : isCompleted ? "bloom" : stage;
-
   return (
     <div className="flex flex-1 flex-col py-8">
       <div className="grid flex-1 items-center gap-8 lg:grid-cols-2">
         {/* ── 식물 시각 영역 ───────────────────────── */}
         <div className="flex flex-col items-center justify-center gap-4">
-          <Plant
+          <GrowingPlant
             plantType={plantType}
-            stage={plantStage}
+            progress={progress}
             withered={isAbandoned}
             size="lg"
           />

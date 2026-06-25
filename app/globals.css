@@ -133,3 +133,67 @@
     @apply font-sans;
   }
 }
+
+/* ── 식물 성장 애니메이션 (Task 010) ──────────────────────────────
+   부드러움의 원천은 React가 아니라 CSS transition이다. progress는 1초마다
+   `--progress` 인라인 변수로만 갱신되고, 아래 transform/opacity가 var(--progress)를
+   참조하며 transition으로 틱 사이를 60fps로 보간한다(GPU 합성 transform/opacity만 사용). */
+
+/* 식물 SVG를 감싸는 HTML 성장 래퍼.
+   화분 밑동(50% 100%)을 기준으로 progress에 따라 위로 자라며 커지고 또렷해진다.
+   transform/opacity 값 자체는 GrowingPlant가 progress로부터 계산해 인라인으로 주입하고
+   (스타일시트의 transform calc(var())는 이 엔진에서 변수 변경 시 재계산되지 않음),
+   여기서는 정적인 origin/transition/합성 힌트만 선언한다. transition이 1초 틱 사이를
+   60fps로 보간한다(GPU 합성 transform/opacity). */
+.plant-growth {
+  display: inline-flex;
+  transform-origin: 50% 100%;
+  transition:
+    transform 0.9s linear,
+    opacity 0.9s linear;
+  will-change: transform, opacity;
+}
+
+/* 만개 진입 시 꽃잎 펼침 — 세 식물 모두 data-part="petal"로 일관 */
+@keyframes bloom {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.plant-growth[data-stage="bloom"] [data-part="petal"] {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bloom 0.6s ease-out both;
+}
+
+/* 시들기 — 정적 표현 대신 transition으로 부드럽게 채도↓ + 기울임 */
+.plant-withered {
+  filter: grayscale(0.6) sepia(0.35);
+  transform: rotate(6deg);
+  opacity: 0.7;
+  transition:
+    filter 0.7s ease,
+    transform 0.7s ease,
+    opacity 0.7s ease;
+}
+
+/* 모션 민감 사용자 — 모션만 제거하고 최종 상태(크기/단계)는 유지 */
+@media (prefers-reduced-motion: reduce) {
+  .plant-growth,
+  .plant-withered {
+    transition: none;
+  }
+  .plant-growth[data-stage="bloom"] [data-part="petal"] {
+    animation: none;
+  }
+}

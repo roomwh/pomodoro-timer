@@ -9,7 +9,12 @@ import { cactusParts } from "@/components/plant/assets/cactus";
 // `withered`는 시들기 정적 표현(채도↓ + 기울임)으로 표시한다.
 // 단계 간 부드러운 보간/시들기 트랜지션은 Task 010에서 추가한다.
 
-const PARTS_BY_TYPE: Record<PlantType, (stage: GrowthStage) => React.ReactNode> = {
+// 식물 종류별 파츠 빌더 매핑. 정적 Plant(정원용)와 GrowingPlant(타이머 애니메이션)가
+// 공유하므로 export 한다 — 중복 정의 금지.
+export const PARTS_BY_TYPE: Record<
+  PlantType,
+  (stage: GrowthStage) => React.ReactNode
+> = {
   tulip: tulipParts,
   sunflower: sunflowerParts,
   cactus: cactusParts,

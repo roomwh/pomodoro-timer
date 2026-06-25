@@ -147,18 +147,18 @@
     - [x] 짧은 시간(예: 1분) 타이머의 완료 시점 정확도 검증
     - [x] 포기 시 진행 중단 및 초기 상태 복귀 확인
 
-- [ ] **Task 010: 식물 성장 애니메이션 구현 (CSS 변수 바인딩)**
+- [x] **Task 010: 식물 성장 애니메이션 구현 (CSS 변수 바인딩)**
   - See: `/tasks/010-plant-growth-animation.md`
-  - [ ] `progress`(0.0~1.0)를 CSS 변수(`--progress`)에 바인딩 — 매초 React 리렌더 회피
-  - [ ] progress 구간별 성장 단계 분기 (씨앗 0~0.10 / 새싹 0.10~0.40 / 꽃봉오리 0.40~0.80 / 만개 0.80~1.00)
-  - [ ] SVG 속성(height/opacity/transform)을 CSS 변수에 연동, CSS transition으로 부드러운 전환
-  - [ ] 만개 시 꽃잎 펼침 keyframe(`@keyframes bloom`), 포기 시 시들기(grayscale + rotate) 트랜지션
-  - [ ] GPU 가속(transform/opacity) 활용 60fps 성능 확보 검증
+  - [x] `progress`(0.0~1.0)를 요소에 바인딩 — 매초 1회 갱신 + `useMemo`로 파츠 서브트리 리렌더 회피
+  - [x] progress 구간별 성장 단계 분기 (씨앗 0~0.10 / 새싹 0.10~0.40 / 꽃봉오리 0.40~0.80 / 만개 0.80~1.00)
+  - [x] 성장(scale/opacity)을 progress에 연동, CSS transition으로 부드러운 전환 (스타일시트 `calc(var())` 미반영 이슈로 값은 인라인 계산 주입)
+  - [x] 만개 시 꽃잎 펼침 keyframe(`@keyframes bloom`), 포기 시 시들기(grayscale + sepia + rotate) 트랜지션
+  - [x] GPU 가속(transform/opacity) 활용 60fps 성능 확보 검증
   - **테스트 체크리스트** (Playwright 기반 E2E 또는 수동 검증)
-    - [ ] progress 변화에 따라 성장 단계가 정확한 구간에서 전환되는지 확인
-    - [ ] 식물 렌더링 중 불필요한 React 리렌더가 발생하지 않는지 확인 (프로파일링)
-    - [ ] 시들기/만개 애니메이션 시각 동작 확인
-    - [ ] 백그라운드 복귀 시 식물이 보정된 단계로 점프하는지 확인
+    - [x] progress 변화에 따라 성장 단계가 정확한 구간에서 전환되는지 확인
+    - [x] 식물 렌더링 중 불필요한 React 리렌더가 발생하지 않는지 확인 (파츠 노드 참조 동일성)
+    - [x] 시들기/만개 애니메이션 시각 동작 확인
+    - [x] 백그라운드 복귀 시 식물이 보정된 단계로 점프하는지 확인
 
 - [ ] **Task 011: 세션 저장 및 정원 데이터 연동**
   - See: `/tasks/011-session-persistence.md`
