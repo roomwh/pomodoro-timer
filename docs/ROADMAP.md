@@ -108,17 +108,17 @@
 
 ### Phase 3: 핵심 기능 구현
 
-- [ ] **Task 007: Supabase 설정 및 데이터 모델/RLS 구축** - 우선순위
+- [x] **Task 007: Supabase 설정 및 데이터 모델/RLS 구축** - 우선순위
   - See: `/tasks/007-supabase-setup.md`
-  - [ ] Supabase 프로젝트 연동 및 환경 변수 구성 (`@supabase/supabase-js`, `@supabase/ssr` 설치)
-  - [ ] 브라우저/서버 클라이언트 헬퍼 작성 (`lib/supabase/client.ts`, `lib/supabase/server.ts`)
-  - [ ] `focus_sessions` 테이블 생성 (duration_minutes CHECK 1~180, status enum, plant_type 등)
-  - [ ] 정원 뷰 전략 결정 및 구현 (단일 테이블 + View 또는 `garden_plants` 별도 테이블)
-  - [ ] operation별 RLS 정책 적용 (SELECT/UPDATE/DELETE는 USING, INSERT는 WITH CHECK)
+  - [x] Supabase 프로젝트 연동 및 환경 변수 구성 (`@supabase/supabase-js`, `@supabase/ssr` 설치)
+  - [x] 브라우저/서버 클라이언트 헬퍼 작성 (`lib/supabase/client.ts`, `lib/supabase/server.ts`)
+  - [x] `focus_sessions` 테이블 생성 (duration_minutes CHECK 1~180, status enum, plant_type 등)
+  - [x] 정원 뷰 전략 결정 및 구현 (단일 테이블 + View 또는 `garden_plants` 별도 테이블)
+  - [x] operation별 RLS 정책 적용 (SELECT/UPDATE/DELETE는 USING, INSERT는 WITH CHECK)
   - **테스트 체크리스트** (Playwright 기반 E2E 또는 수동 검증)
-    - [ ] RLS 검증: 타 사용자 명의 INSERT 차단 확인 (WITH CHECK)
-    - [ ] 본인 데이터만 SELECT 조회되는지 확인
-    - [ ] duration_minutes 범위(1~180) CHECK 제약 위반 시 거부 확인
+    - [x] RLS 검증: 타 사용자 명의 INSERT 차단 확인 (WITH CHECK)
+    - [x] 본인 데이터만 SELECT 조회되는지 확인
+    - [x] duration_minutes 범위(1~180) CHECK 제약 위반 시 거부 확인
 
 - [ ] **Task 008: 인증 시스템 구현 (Supabase Auth + Next.js 16 Proxy)**
   - See: `/tasks/008-auth-system.md`
