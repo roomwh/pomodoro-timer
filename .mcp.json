@@ -18,6 +18,10 @@
         "TEMPLATES_USE": "en",
         "ENABLE_GUI": "true"
       }
+    },
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=nklqdefkditbamxossyr&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cdevelopment"
     }
   }
 }
