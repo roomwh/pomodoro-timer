@@ -1,6 +1,6 @@
 # 데이터 모델 설계 (Supabase)
 
-> **상태**: 설계 문서. 실제 테이블 생성·RLS 적용·정원 전략 최종 결정은 **Task 007**에서 수행한다.
+> **상태**: ✅ **Task 007에서 적용 완료**. `supabase/migrations/0001_init.sql`로 테이블·인덱스·RLS·정원 View가 원격 Supabase에 생성됨. 정원 전략은 **A안(View) 최종 확정**.
 > 이 문서는 도메인 타입(`lib/types.ts`)과 짝을 이루는 DB 측 스펙을 정의한다.
 
 ## 개요
@@ -81,12 +81,13 @@ create policy "focus_sessions_delete_own"
 
 ## 정원(garden) 데이터 전략
 
-정원에 전시되는 식물(`GardenPlant`)은 `status='completed'`인 `focus_sessions`의 투영이다. 구현 방식은 Task 007에서 아래 두 안 중 결정한다.
+정원에 전시되는 식물(`GardenPlant`)은 `status='completed'`인 `focus_sessions`의 투영이다. **Task 007에서 A안(View)으로 최종 확정·적용**했다.
 
-### A안 — View (권장 후보)
+### ✅ A안 — View (확정·적용됨)
 
 ```sql
-create view public.garden_plants as
+create view public.garden_plants
+  with (security_invoker = true) as
   select id, user_id, plant_type,
          completed_at as planted_at,
          duration_minutes
