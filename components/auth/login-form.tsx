@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 import { loginSchema, type LoginInput } from "@/lib/schemas";
@@ -70,10 +71,11 @@ export function LoginForm() {
         </>
       }
     >
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate aria-busy={isSubmitting}>
         <FieldGroup>
           {formError ? (
             <div
+              id="login-form-error"
               role="alert"
               className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             >
@@ -88,7 +90,9 @@ export function LoginForm() {
               type="email"
               autoComplete="email"
               placeholder="you@example.com"
+              autoFocus
               aria-invalid={!!errors.email}
+              aria-describedby={formError ? "login-form-error" : undefined}
               {...register("email")}
             />
             <FieldError errors={[errors.email]} />
@@ -101,13 +105,20 @@ export function LoginForm() {
               type="password"
               autoComplete="current-password"
               aria-invalid={!!errors.password}
+              aria-describedby={formError ? "login-form-error" : undefined}
               {...register("password")}
             />
             <FieldError errors={[errors.password]} />
           </Field>
 
           <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "처리 중…" : "로그인"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" aria-hidden /> 처리 중…
+              </>
+            ) : (
+              "로그인"
+            )}
           </Button>
         </FieldGroup>
       </form>

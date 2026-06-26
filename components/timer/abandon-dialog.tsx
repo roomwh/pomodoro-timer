@@ -12,7 +12,8 @@ import {
 import { Button } from "@/components/ui/button";
 
 // 포기 확인 다이얼로그 — 진행 중 세션을 포기할지 확인한다.
-// 확인 시 onConfirm(시들기 표현 → 초기화)을 호출한다. 실제 세션 'abandoned' 저장은 Task 011.
+// 확인 시 onConfirm(시들기 표현 → 세션 'abandoned' 저장 → 초기화)을 호출한다.
+// Radix Dialog가 포커스 트랩/Esc 닫기/스크롤 잠금을 기본 제공한다.
 export function AbandonDialog({
   open,
   onOpenChange,

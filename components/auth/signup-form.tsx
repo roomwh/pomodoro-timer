@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 import { signupSchema, type SignupInput } from "@/lib/schemas";
@@ -70,10 +71,11 @@ export function SignupForm() {
         </>
       }
     >
-      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate aria-busy={isSubmitting}>
         <FieldGroup>
           {formError ? (
             <div
+              id="signup-form-error"
               role="alert"
               className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
             >
@@ -88,7 +90,9 @@ export function SignupForm() {
               type="email"
               autoComplete="email"
               placeholder="you@example.com"
+              autoFocus
               aria-invalid={!!errors.email}
+              aria-describedby={formError ? "signup-form-error" : undefined}
               {...register("email")}
             />
             <FieldError errors={[errors.email]} />
@@ -102,6 +106,7 @@ export function SignupForm() {
               autoComplete="new-password"
               placeholder="최소 8자 이상"
               aria-invalid={!!errors.password}
+              aria-describedby={formError ? "signup-form-error" : undefined}
               {...register("password")}
             />
             <FieldError errors={[errors.password]} />
@@ -115,13 +120,20 @@ export function SignupForm() {
               autoComplete="new-password"
               placeholder="비밀번호 재입력"
               aria-invalid={!!errors.confirmPassword}
+              aria-describedby={formError ? "signup-form-error" : undefined}
               {...register("confirmPassword")}
             />
             <FieldError errors={[errors.confirmPassword]} />
           </Field>
 
           <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "처리 중…" : "회원가입"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin" aria-hidden /> 처리 중…
+              </>
+            ) : (
+              "회원가입"
+            )}
           </Button>
         </FieldGroup>
       </form>
