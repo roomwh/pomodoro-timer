@@ -56,6 +56,14 @@ export function TimerView() {
           description: "방금 키운 식물이 정원에 추가됐어요.",
         });
       }
+    }).catch(() => {
+      // 전송 계층 실패(네트워크 단절, 세션 만료로 Server Action이 리디렉션되어 받는
+      // "unexpected response" 등)는 saveSession의 {ok:false}에 도달하지 못하고 Promise를
+      // reject한다. catch가 없으면 unhandled rejection으로 토스트 없이 콘솔 에러만 남으므로,
+      // 여기서 사용자에게 실패를 알린다(정원 데이터는 저장되지 않은 상태).
+      toast.error("세션 저장에 실패했어요", {
+        description: "네트워크 또는 로그인 세션 문제로 저장하지 못했어요. 다시 로그인 후 시도해주세요.",
+      });
     });
   }, [status, startedAt, durationMinutes, plantType]);
 
