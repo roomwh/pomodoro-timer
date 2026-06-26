@@ -25,6 +25,7 @@ export function GrowingPlant({
   withered = false,
   size = "lg",
   className,
+  animate = false,
 }: {
   plantType: PlantType;
   /** 진행도 0.0~1.0 — 1초마다 갱신되며 CSS 변수로 전달된다 */
@@ -32,6 +33,10 @@ export function GrowingPlant({
   withered?: boolean;
   size?: keyof typeof SIZE_CLASS;
   className?: string;
+  /** 진행 중일 때만 true — `will-change`로 합성 레이어를 승격한다.
+   *  idle/완료/정원처럼 매초 갱신이 없는 정적 상태에서는 false로 두어
+   *  불필요한 상시 레이어 승격(메모리·합성 비용)을 피한다. */
+  animate?: boolean;
 }) {
   // 시들기가 명시되면 시들기 파츠(만개와 동일 형태), 아니면 progress 기반 단계.
   const stage = getGrowthStage(progress);
@@ -56,6 +61,7 @@ export function GrowingPlant({
     <div
       className={cn("plant-growth", className)}
       data-stage={withered ? "withered" : stage}
+      data-animate={animate ? "true" : undefined}
       style={
         { "--progress": progress, transform: `scale(${scale})`, opacity } as React.CSSProperties
       }

@@ -10,8 +10,9 @@
   /* layout.tsx가 주입하는 Geist 변수에 연결하고, 한글은 시스템 폰트로 폴백 */
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     "Apple SD Gothic Neo", "Malgun Gothic", "Segoe UI", sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "Cascadia Code",
-    "Segoe UI Mono", monospace;
+  /* Geist Mono를 로드하지 않고 시스템 monospace 스택을 사용한다(dev 전용 digest 외 미사용) */
+  --font-mono: ui-monospace, "Cascadia Code", "Segoe UI Mono", "Menlo",
+    "Consolas", monospace;
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -151,6 +152,11 @@
   transition:
     transform 0.9s linear,
     opacity 0.9s linear;
+}
+
+/* 합성 레이어 승격은 매초 갱신이 일어나는 진행(running) 중에만 — idle/완료/정원의
+   정적 식물에는 will-change를 두지 않아 불필요한 레이어/메모리 비용을 피한다. */
+.plant-growth[data-animate="true"] {
   will-change: transform, opacity;
 }
 

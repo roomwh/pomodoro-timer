@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Play, Flag, RotateCcw, Info } from "lucide-react";
 import { toast } from "sonner";
+import { track } from "@vercel/analytics";
 
 import { DEFAULT_DURATION_MINUTES, PLANT_META } from "@/lib/constants";
 import { formatMMSS } from "@/lib/time";
@@ -40,6 +41,14 @@ export function TimerView() {
     savedRef.current = true;
 
     const sessionStatus = status === "completed" ? "completed" : "abandoned";
+
+    // 성공 지표(완료율) 기반 — 완료 시점에 익명 커스텀 이벤트를 1회 발사한다.
+    // PII 없이 집중 시간·식물 종류만 담고, 저장 성공 여부와 무관하게 "사용자가
+    // 집중을 완료한 사실" 자체를 기록한다. 프로덕션 Vercel에서만 전송(fire-and-forget).
+    if (sessionStatus === "completed") {
+      track("focus_completed", { durationMinutes, plantType });
+    }
+
     void saveSession({
       durationMinutes,
       plantType,
@@ -114,6 +123,7 @@ export function TimerView() {
             progress={progress}
             withered={isAbandoned}
             size="lg"
+            animate={isRunning}
           />
           {isRunning ? (
             <p
